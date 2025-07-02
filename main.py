@@ -1,5 +1,6 @@
 import datetime as dt
 import requests
+import os
 from translate import Translator
 from scripts import *
 from input_cities import *
@@ -7,7 +8,7 @@ from input_cities import *
 
 # Using API from weather website
 BASE_URL = "https://api.openweathermap.org/data/2.5/weather?"
-API_KEY = "04c10d6b9ec8b71644df0482cb8951ac"
+API_KEY = os.getenv("OPENWEATHER_API_KEY")
 CITY = city()
 url = f"https://api.openweathermap.org/data/2.5/weather?q={CITY}&APPID={API_KEY}"
 weather = requests.get(url).json()
