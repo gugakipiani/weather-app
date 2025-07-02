@@ -2,13 +2,29 @@
 
 A command-line weather app that fetches real-time weather data using the OpenWeather API, with support for Georgian translation.
 
-## Features
-- Live weather data by city
-- Translates output to Georgian using the `translate` library
-- Temperature, wind, humidity, visibility, sunrise & sunset
-- CSV lookup for country names using ISO codes
 
-## How to Run
+## Features
+
+- Live weather data by city
+- Translates output to **Georgian** using the `translate` package
+- Displays:
+  - Temperature (actual and "feels like")
+  - Humidity and wind speed
+  - Visibility
+  - Sunrise and sunset times
+- Uses a CSV file to convert ISO country codes to full country names
+
+---
+
+## 📦 Requirements
+
+- Python 3.8 or higher
+- An OpenWeatherMap API key
+- Internet connection
+
+---
+
+## 🛠️ How to Run
 
 1. **Clone the repository:**
 
@@ -23,13 +39,22 @@ A command-line weather app that fetches real-time weather data using the OpenWea
     pip install -r requirements.txt
     ```
 
-3. **Run the app:**
+3. **Set up your environment variables:**
+
+    Create a `.env` file in the root folder and add your OpenWeatherMap API key:
+
+    ```env
+    OPENWEATHER_API_KEY=your_api_key_here
+    ```
+
+4. **Run the app:**
 
     ```bash
     python main.py
     ```
 
-4. **Example output:**
+
+   **Example output:**
 
     ```
     თბილისი, საქართველო
@@ -43,9 +68,15 @@ A command-line weather app that fetches real-time weather data using the OpenWea
     დაისი: 20:43:00
     ```
 
+    
 
 
-Notes
-- Requires an OpenWeather API key. You can replace the placeholder in main.py.
-- Output is translated into Georgian using the `translate` package.
-- The app uses a CSV file (`wikipedia-iso-country-codes.csv`) to convert country codes to full names.
+
+
+---
+
+## Notes
+
+- An **OpenWeatherMap API key** is required. Store it in a `.env` file as shown above.
+- Translations are handled using the `translate` Python package.
+- Country names are resolved from ISO codes using the `wikipedia-iso-country-codes.csv` file.
