@@ -4,74 +4,68 @@ import os
 from dotenv import load_dotenv
 from translate import Translator
 from scripts import *
-from input_cities import *
+from input_cities import *  # Includes city() and translated_city()
 
-# Load environment variables from .env file
+# Load environment variables from .env
 load_dotenv()
 
-# Get API key from environment variable
+# Retrieve API key from environment
 API_KEY = os.getenv("OPENWEATHER_API_KEY")
 if not API_KEY:
     raise ValueError("No API key found. Please set the OPENWEATHER_API_KEY environment variable.")
 
-# Ask user for city input
+# Get normalized user input
 CITY = city()
 
-# Create API request URL
+# Build request URL
 url = f"https://api.openweathermap.org/data/2.5/weather?q={CITY}&APPID={API_KEY}"
-
-# Make the API request and get weather data
 weather = requests.get(url).json()
 
-# Translator to convert English text to Georgian
+# Translate city name to Georgian
 translator = Translator(to_lang="ka")
+translated_city_name = translated_city(CITY)
 
-# Translate city name
-translated_city = translated_city(CITY)
-
-# Handle invalid city or error in API response
+# Check API response
 if weather['cod'] != 200:
-    print("შეცდომა დასახელებაში!")  # Error message in Georgian
+    print("შეცდომა დასახელებაში!")  # Invalid city
 else:
-    # Extract and convert temperature values
+    # Extract temperature
     temp_kelvin = weather['main']['temp']
     temp_celsius, temp_fahrenheit = kelvin_to_celsius_and_fahrenheit(temp_kelvin)
 
+    # Feels like
     feels_like_kelvin = weather['main']['feels_like']
     feels_like_celsius, feels_like_fahrenheit = kelvin_to_celsius_and_fahrenheit(feels_like_kelvin)
 
-    # Extract humidity and wind speed
+    # Humidity and wind
     humidity = weather['main']['humidity']
-    wind_speed_metres_per_seconds = weather['wind']['speed']
-    wind_speed_kilometers_per_hour = wind_speed_metres_per_seconds / 1000 * 3600
+    wind_speed_mps = weather['wind']['speed']
+    wind_speed_kph = wind_speed_mps / 1000 * 3600
 
-    # Handle optional visibility field
-    if 'visibility' in weather:
-        visibility = f"{(weather['visibility'] / 1000):.1f}"
-    else:
-        visibility = "უცნობია"  # "Unknown" in Georgian
+    # Visibility (optional)
+    visibility = f"{(weather['visibility'] / 1000):.1f}" if 'visibility' in weather else "უცნობია"
 
-    # Translate weather description
+    # Description translation
     original_description = weather['weather'][0]['description']
     translated_description = translator.translate(original_description)
 
-    # Convert sunrise and sunset times from timestamps to readable format
-    sunrise_time = dt.datetime.utcfromtimestamp(weather['sys']['sunrise'] + weather['timezone'])
-    sunset_time = dt.datetime.utcfromtimestamp(weather['sys']['sunset'] + weather['timezone'])
+    # Sunrise and sunset (converted to local time using timezone offset)
+    sunrise = dt.datetime.utcfromtimestamp(weather['sys']['sunrise'] + weather['timezone'])
+    sunset = dt.datetime.utcfromtimestamp(weather['sys']['sunset'] + weather['timezone'])
 
-    # Get full country name from country code
+    # Country translation
     country_code = weather['sys']['country']
     country = country_name(country_code)
     translated_country = translator.translate(country)
 
-    # Print the translated weather report
+    # Output results
     print()
-    print(translated_city + ', ' + translated_country)
+    print(translated_city_name + ', ' + translated_country)
     print(translated_description)
     print(f'ტემპერატურა: {temp_celsius:.1f} °C')
     print(f'მგრძნობელობა: {feels_like_celsius:.1f} °C')
     print(f'ტენიანობა: {humidity}%')
-    print(f'ქარის სიჩქარე: {wind_speed_kilometers_per_hour:.1f} კმ/სთ')
+    print(f'ქარის სიჩქარე: {wind_speed_kph:.1f} კმ/სთ')
     print(f'ხილვადობა: {visibility} კმ')
-    print('აისი:', sunrise_time)
-    print('დაისი:', sunset_time)
+    print('აისი:', sunrise)
+    print('დაისი:', sunset)
